@@ -6,22 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('activity_components', function (Blueprint $table) {
+        Schema::create('semesters', function (Blueprint $table) {
             $table->id();
+            $table->string('semester_code', 255)->unique();
+            $table->string('semester_name', 255);
+            $table->string('academic_year', 10);
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('activity_components');
+        Schema::dropIfExists('semesters');
     }
 };
