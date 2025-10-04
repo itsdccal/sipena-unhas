@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Degree;
 use App\Models\Faculty;
 use App\Models\StudyProgram;
 use Illuminate\Contracts\View\View;
@@ -14,14 +15,14 @@ class AdminStudyProgramController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = StudyProgram::with('faculty');
+        $query = StudyProgram::with(['faculty', 'degree']);
 
         // Search
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search): void {
-                $q->where('name', 'like', '%' . $search . '%')
-                  ->orWhere('code', 'like', '%' . $search . '%');
+                $q->where('sp_name', 'like', '%' . $search . '%')
+                  ->orWhere('sp_code', 'like', '%' . $search . '%');
             });
         }
 
@@ -30,40 +31,36 @@ class AdminStudyProgramController extends Controller
             $query->where('faculty_id', $request->input('faculty'));
         }
 
-        // Filter by Status
-        if ($request->filled('status')) {
-            $isActive = $request->input('status') === 'active';
-            $query->where('is_active', $isActive);
+        // Filter by Degree
+        if ($request->filled('degree')) {
+            $query->where('degree_id', $request->input('degree'));
         }
 
         $studyPrograms = $query->latest()->paginate(15);
-        $faculties = Faculty::where('is_active', true)->get();
+        $faculties = Faculty::orderBy('faculty_name')->get();
+        $degrees = Degree::orderBy('degree_name')->get();
 
-        return view('admin.study-programs.index', compact('studyPrograms', 'faculties'));
+        return view('admin.study-programs.index', compact('studyPrograms', 'faculties', 'degrees'));
     }
 
     public function create(): View
     {
-        $faculties = Faculty::where('is_active', true)->get();
+        $faculties = Faculty::orderBy('faculty_name')->get();
+        $degrees = Degree::orderBy('degree_name')->get();
 
-        return view('admin.study-programs.create', compact('faculties'));
+        return view('admin.study-programs.create', compact('faculties', 'degrees'));
     }
 
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:50', 'unique:study_programs,code'],
-            'faculty_id' => ['nullable', 'exists:faculties,id'],
-            'is_active' => ['boolean'],
+            'sp_name' => ['required', 'string', 'max:255'],
+            'sp_code' => ['required', 'string', 'max:10', 'unique:study_programs,sp_code'],
+            'faculty_id' => ['required', 'exists:faculties,id'],
+            'degree_id' => ['required', 'exists:degrees,id'],
         ]);
 
-        StudyProgram::create([
-            'name' => $validated['name'],
-            'code' => $validated['code'],
-            'faculty_id' => $validated['faculty_id'] ?? null,
-            'is_active' => $validated['is_active'] ?? true,
-        ]);
+        StudyProgram::create($validated);
 
         return redirect()->route('admin.study-programs.index')
             ->with('success', 'Study program created successfully!');
@@ -71,26 +68,22 @@ class AdminStudyProgramController extends Controller
 
     public function edit(StudyProgram $studyProgram): View
     {
-        $faculties = Faculty::where('is_active', true)->get();
+        $faculties = Faculty::orderBy('faculty_name')->get();
+        $degrees = Degree::orderBy('degree_name')->get();
 
-        return view('admin.study-programs.edit', compact('studyProgram', 'faculties'));
+        return view('admin.study-programs.edit', compact('studyProgram', 'faculties', 'degrees'));
     }
 
     public function update(Request $request, StudyProgram $studyProgram): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'code' => ['required', 'string', 'max:50', Rule::unique('study_programs', 'code')->ignore($studyProgram->id)],
-            'faculty_id' => ['nullable', 'exists:faculties,id'],
-            'is_active' => ['boolean'],
+            'sp_name' => ['required', 'string', 'max:255'],
+            'sp_code' => ['required', 'string', 'max:10', Rule::unique('study_programs', 'sp_code')->ignore($studyProgram->id)],
+            'faculty_id' => ['required', 'exists:faculties,id'],
+            'degree_id' => ['required', 'exists:degrees,id'],
         ]);
 
-        $studyProgram->update([
-            'name' => $validated['name'],
-            'code' => $validated['code'],
-            'faculty_id' => $validated['faculty_id'] ?? null,
-            'is_active' => $validated['is_active'] ?? true,
-        ]);
+        $studyProgram->update($validated);
 
         return redirect()->route('admin.study-programs.index')
             ->with('success', 'Study program updated successfully!');
@@ -108,15 +101,5 @@ class AdminStudyProgramController extends Controller
 
         return redirect()->route('admin.study-programs.index')
             ->with('success', 'Study program deleted successfully!');
-    }
-
-    public function toggleStatus(StudyProgram $studyProgram): RedirectResponse
-    {
-        $studyProgram->update(['is_active' => !$studyProgram->is_active]);
-
-        $status = $studyProgram->is_active ? 'activated' : 'deactivated';
-
-        return redirect()->back()
-            ->with('success', "Study program {$status} successfully!");
     }
 }

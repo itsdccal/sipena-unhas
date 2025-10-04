@@ -19,7 +19,7 @@ class ReportController extends Controller
         $query = Report::with(['studyProgram', 'semester', 'creator']);
 
         // Regular users only see their own reports
-        if (!Auth::user()?->isAdmin()) {
+        if (Auth::user()->role !== 'admin') {
             $query->where('created_by', Auth::id());
         }
 
@@ -43,16 +43,16 @@ class ReportController extends Controller
         }
 
         $reports = $query->latest()->paginate(10);
-        $studyPrograms = StudyProgram::where('is_active', true)->get();
-        $semesters = Semester::where('is_active', true)->get();
+        $studyPrograms = StudyProgram::orderBy('sp_name')->get();
+        $semesters = Semester::orderBy('semester_name')->get();
 
         return view('reports.index', compact('reports', 'studyPrograms', 'semesters'));
     }
 
     public function create(): View
     {
-        $studyPrograms = StudyProgram::where('is_active', true)->get();
-        $semesters = Semester::where('is_active', true)->get();
+        $studyPrograms = StudyProgram::orderBy('sp_name')->get();
+        $semesters = Semester::orderBy('semester_name')->get();
 
         return view('reports.create', compact('studyPrograms', 'semesters'));
     }
@@ -145,7 +145,7 @@ class ReportController extends Controller
         $report->load(['studyProgram', 'semester', 'creator', 'activityDetails', 'documents']);
 
         // Regular users can only view their own reports
-        if (!Auth::user()?->isAdmin() && $report->created_by !== Auth::id()) {
+        if (Auth::user()->role !== 'admin' && $report->user_id !== Auth::id()) {
             abort(403);
         }
 
@@ -155,13 +155,13 @@ class ReportController extends Controller
     public function edit(Report $report): View
     {
         // Regular users can only edit their own reports
-        if (!Auth::user()?->isAdmin() && $report->created_by !== Auth::id()) {
+        if (Auth::user()->role !== 'admin' && $report->user_id !== Auth::id()) {
             abort(403);
         }
 
         $report->load(['activityDetails', 'documents']);
-        $studyPrograms = StudyProgram::where('is_active', true)->get();
-        $semesters = Semester::where('is_active', true)->get();
+        $studyPrograms = StudyProgram::orderBy('sp_name')->get();
+        $semesters = Semester::orderBy('semester_name')->get();
 
         return view('reports.edit', compact('report', 'studyPrograms', 'semesters'));
     }
@@ -169,7 +169,7 @@ class ReportController extends Controller
     public function update(Request $request, Report $report): RedirectResponse
     {
         // Regular users can only update their own reports
-        if (!Auth::user()?->isAdmin() && $report->created_by !== Auth::id()) {
+        if (Auth::user()->role !== 'admin' && $report->user_id !== Auth::id()) {
             abort(403);
         }
 
@@ -242,8 +242,7 @@ class ReportController extends Controller
 
     public function destroy(Report $report): RedirectResponse
     {
-        // Regular users can only delete their own reports
-        if (!Auth::user()?->isAdmin() && $report->created_by !== Auth::id()) {
+        if (Auth::user()->role !== 'admin' && $report->user_id !== Auth::id()) {
             abort(403);
         }
 

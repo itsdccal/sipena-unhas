@@ -23,7 +23,7 @@ class AdminAccountController extends Controller
             $search = $request->input('search');
             $query->where(function ($q) use ($search): void {
                 $q->where('name', 'like', '%' . $search . '%')
-                  ->orWhere('email', 'like', '%' . $search . '%');
+                  ->orWhere('nip', 'like', '%' . $search . '%'); // GANTI email jadi nip
             });
         }
 
@@ -40,18 +40,21 @@ class AdminAccountController extends Controller
         // Filter by Status
         if ($request->filled('status')) {
             $isActive = $request->input('status') === 'active';
-            $query->where('is_active', $isActive);
+            $query->where('status', $isActive); // GANTI is_active jadi status
         }
 
         $users = $query->latest()->paginate(15);
-        $studyPrograms = StudyProgram::where('is_active', true)->get();
+
+        // PERBAIKAN: Hapus filter is_active karena kolom tidak ada
+        $studyPrograms = StudyProgram::all(); // atau ::orderBy('sp_name')->get()
 
         return view('admin.accounts.index', compact('users', 'studyPrograms'));
     }
 
     public function create(): View
     {
-        $studyPrograms = StudyProgram::where('is_active', true)->get();
+        // PERBAIKAN: Hapus filter is_active
+        $studyPrograms = StudyProgram::orderBy('sp_name')->get();
 
         return view('admin.accounts.create', compact('studyPrograms'));
     }
@@ -60,20 +63,20 @@ class AdminAccountController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'nip' => ['required', 'string', 'max:255', 'unique:users,nip'], // GANTI email jadi nip
             'password' => ['required', 'confirmed', Password::defaults()],
-            'role' => ['required', 'in:admin,user'],
+            'role' => ['required', 'in:admin,staff'], // GANTI 'user' jadi 'staff'
             'study_program_id' => ['nullable', 'exists:study_programs,id'],
-            'is_active' => ['boolean'],
+            'status' => ['boolean'], // GANTI is_active jadi status
         ]);
 
         User::create([
             'name' => $validated['name'],
-            'email' => $validated['email'],
+            'nip' => $validated['nip'], // GANTI email jadi nip
             'password' => Hash::make($validated['password']),
             'role' => $validated['role'],
             'study_program_id' => $validated['study_program_id'] ?? null,
-            'is_active' => $validated['is_active'] ?? true,
+            'status' => $validated['status'] ?? true, // GANTI is_active jadi status
         ]);
 
         return redirect()->route('admin.accounts.index')
@@ -82,7 +85,8 @@ class AdminAccountController extends Controller
 
     public function edit(User $account): View
     {
-        $studyPrograms = StudyProgram::where('is_active', true)->get();
+        // PERBAIKAN: Hapus filter is_active
+        $studyPrograms = StudyProgram::orderBy('sp_name')->get();
 
         return view('admin.accounts.edit', compact('account', 'studyPrograms'));
     }
@@ -91,19 +95,19 @@ class AdminAccountController extends Controller
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($account->id)],
+            'nip' => ['required', 'string', 'max:255', Rule::unique('users', 'nip')->ignore($account->id)], // GANTI email jadi nip
             'password' => ['nullable', 'confirmed', Password::defaults()],
-            'role' => ['required', 'in:admin,user'],
+            'role' => ['required', 'in:admin,staff'], // GANTI 'user' jadi 'staff'
             'study_program_id' => ['nullable', 'exists:study_programs,id'],
-            'is_active' => ['boolean'],
+            'status' => ['boolean'], // GANTI is_active jadi status
         ]);
 
         $data = [
             'name' => $validated['name'],
-            'email' => $validated['email'],
+            'nip' => $validated['nip'], // GANTI email jadi nip
             'role' => $validated['role'],
             'study_program_id' => $validated['study_program_id'] ?? null,
-            'is_active' => $validated['is_active'] ?? true,
+            'status' => $validated['status'] ?? true, // GANTI is_active jadi status
         ];
 
         if (!empty($validated['password'])) {
@@ -136,9 +140,10 @@ class AdminAccountController extends Controller
                 ->with('error', 'You cannot deactivate your own account!');
         }
 
-        $account->update(['is_active' => !$account->is_active]);
+        // GANTI is_active jadi status
+        $account->update(['status' => !$account->status]);
 
-        $status = $account->is_active ? 'activated' : 'deactivated';
+        $status = $account->status ? 'activated' : 'deactivated';
 
         return redirect()->back()
             ->with('success', "User {$status} successfully!");

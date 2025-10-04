@@ -35,14 +35,15 @@ class AuthenticatedSessionController extends Controller
             return redirect()->intended(route('login'));
         }
 
-        // Check if user is active
-        if (!$user->is_active) {
+        // Check if user is active - DIPERBAIKI: menggunakan status bukan is_active
+        if (!$user->status) {
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
+            // DIPERBAIKI: error key menggunakan 'nip' bukan 'email'
             return back()->withErrors([
-                'email' => 'Your account has been deactivated. Please contact administrator.',
+                'nip' => 'Your account has been deactivated. Please contact administrator.',
             ]);
         }
 

@@ -14,15 +14,14 @@ class AdminReportController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Report::with(['studyProgram', 'semester', 'creator']);
+        $query = Report::with(['studyProgram', 'semester', 'user']);
 
         // Search
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search): void {
-                $q->where('title', 'like', '%' . $search . '%')
-                  ->orWhere('period', 'like', '%' . $search . '%')
-                  ->orWhereHas('creator', function ($q) use ($search): void {
+                $q->where('program_type', 'like', '%' . $search . '%')
+                  ->orWhereHas('user', function ($q) use ($search): void {
                       $q->where('name', 'like', '%' . $search . '%');
                   });
             });
@@ -48,15 +47,17 @@ class AdminReportController extends Controller
         }
 
         $reports = $query->latest()->paginate(15);
-        $studyPrograms = StudyProgram::where('is_active', true)->get();
-        $semesters = Semester::where('is_active', true)->get();
+
+        // PERBAIKAN: Hapus filter is_active
+        $studyPrograms = StudyProgram::orderBy('sp_name')->get();
+        $semesters = Semester::orderBy('semester_name')->get();
 
         return view('admin.reports.index', compact('reports', 'studyPrograms', 'semesters'));
     }
 
     public function show(Report $report): View
     {
-        $report->load(['studyProgram', 'semester', 'creator', 'activityDetails', 'documents']);
+        $report->load(['studyProgram', 'semester', 'user', 'activityDetails']);
 
         return view('admin.reports.show', compact('report'));
     }
@@ -72,8 +73,6 @@ class AdminReportController extends Controller
     public function exportExcel(Request $request): mixed
     {
         // TODO: Implement Excel export
-        // You can use maatwebsite/excel package
-
         return redirect()->back()->with('info', 'Export feature coming soon!');
     }
 }

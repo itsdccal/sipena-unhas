@@ -1,6 +1,4 @@
 <?php
-// app/Models/User.php
-// Tambahkan ke model User yang sudah ada
 
 namespace App\Models;
 
@@ -13,12 +11,12 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'study_program_id', // TAMBAHKAN INI
+        'study_program_id',
         'name',
         'nip',
         'password',
-        'role',              // TAMBAHKAN INI
-        'status',            // TAMBAHKAN INI
+        'role',
+        'status',
     ];
 
     protected $hidden = [
@@ -29,12 +27,12 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'status' => 'boolean',
         ];
     }
 
-    // TAMBAHKAN RELASI INI
+    // Relationships
     public function studyProgram()
     {
         return $this->belongsTo(StudyProgram::class);
@@ -42,7 +40,6 @@ class User extends Authenticatable
 
     public function reports()
     {
-        return $this->hasMany(Report::class);
+        return $this->hasMany(Report::class, 'user_id');
     }
-
 }

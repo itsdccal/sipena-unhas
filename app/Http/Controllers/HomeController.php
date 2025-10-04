@@ -19,13 +19,14 @@ class HomeController extends Controller
             abort(403, 'Unauthorized access.');
         }
 
-        // Check if user is active
-        if (!$user->is_active) {
+        // Check if user is active - CEK STATUS
+        if (!$user->status) {
             auth()->logout();
             abort(403, 'Your account has been deactivated.');
         }
 
-        if ($user->isAdmin()) {
+        // CEK ROLE LANGSUNG
+        if ($user->role === 'admin') {
             return $this->adminDashboard();
         }
 
@@ -35,21 +36,35 @@ class HomeController extends Controller
     private function adminDashboard(): View
     {
         $totalReports = Report::count();
-        $totalUsers = User::where('role', 'user')->where('is_active', true)->count();
-        $totalStudyPrograms = StudyProgram::where('is_active', true)->count();
-        $totalCost = Report::sum('total_cost');
+
+        $totalUsers = User::where('role', '!=', 'admin')
+            ->where('status', true)
+            ->count();
+
+        $totalStudyPrograms = StudyProgram::count();
+
+        // SESUAIKAN dengan kolom yang benar di database
+        $totalCost = Report::sum('grand_total');
 
         // Reports by Study Program
-        $reportsByStudyProgram = Report::select('study_programs.name as study_program', DB::raw('count(*) as total'))
+        $reportsByStudyProgram = Report::select(
+                'study_programs.sp_name as study_program',
+                DB::raw('count(*) as total')
+            )
             ->join('study_programs', 'reports.study_program_id', '=', 'study_programs.id')
-            ->groupBy('study_programs.name')
+            ->groupBy('study_programs.sp_name')
             ->orderByDesc('total')
             ->limit(5)
             ->get();
 
-        // Reports by Period
-        $reportsByPeriod = Report::select('period', DB::raw('count(*) as count'))
-            ->groupBy('period')
+        // Reports by Period (menggunakan semester sebagai period)
+        // PERBAIKAN: Gunakan semester sebagai "period"
+        $reportsByPeriod = Report::select(
+                'semesters.semester_name as period',
+                DB::raw('count(*) as count')
+            )
+            ->join('semesters', 'reports.semester_id', '=', 'semesters.id')
+            ->groupBy('semesters.semester_name')
             ->orderByDesc('count')
             ->limit(6)
             ->get();
@@ -66,11 +81,11 @@ class HomeController extends Controller
 
     private function userDashboard(User $user): View
     {
-        $totalReports = Report::where('created_by', $user->id)->count();
-        $totalCost = Report::where('created_by', $user->id)->sum('total_cost');
+        $totalReports = Report::where('user_id', $user->id)->count();
+        $totalCost = Report::where('user_id', $user->id)->sum('grand_total');
 
         $recentReports = Report::with(['studyProgram', 'semester'])
-            ->where('created_by', $user->id)
+            ->where('user_id', $user->id)
             ->latest()
             ->limit(5)
             ->get();
