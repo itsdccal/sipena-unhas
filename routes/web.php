@@ -33,6 +33,7 @@ Route::middleware('auth')->group(function () {
 
 // User Reports
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/reports/export', [ReportController::class, 'export'])->name('reports.export');
     Route::resource('reports', ReportController::class);
 });
 // Activities for Report
@@ -45,12 +46,6 @@ Route::put('reports/activities/{activity}', [ActivityDetailController::class, 'u
 Route::delete('reports/activities/{activity}', [ActivityDetailController::class, 'destroy'])
     ->name('reports.activities.destroy');
 
-    // Sub Activities for Activity
-    Route::post('reports/activities/{activity}/sub-activities', [SubActivityDetailController::class, 'store'])
-        ->name('reports.activities.sub-activities.store');
-
-    Route::delete('reports/sub-activities/{subActivity}', [SubActivityDetailController::class, 'destroy'])
-        ->name('reports.sub-activities.destroy');
 
 // Admin Routes
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ReportExport;
 use App\Models\ActivityDetail;
 use App\Models\Report;
 use App\Models\Semester;
@@ -12,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
 {
@@ -175,5 +177,10 @@ public function show(Report $report): View
 
         return redirect()->route('reports.index')
             ->with('success', 'Report deleted successfully!');
+    }
+
+    public function export()
+    {
+        return Excel::download(new ReportExport, 'reports.xlsx');
     }
 }
