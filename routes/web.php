@@ -37,13 +37,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('reports', ReportController::class);
 });
 // Activities for Report
-Route::post('reports/{report}/activities', [ActivityDetailController::class, 'store'])
+Route::post('reports/{report}/activities', [ReportController::class, 'storeActivity'])
     ->name('reports.activities.store');
 
-Route::put('reports/activities/{activity}', [ActivityDetailController::class, 'update'])
+Route::put('reports/activities/{activity}', [ReportController::class, 'updateActivity'])
     ->name('reports.activities.update');
 
-Route::delete('reports/activities/{activity}', [ActivityDetailController::class, 'destroy'])
+Route::delete('reports/activities/{activity}', [ReportController::class, 'destroyActivity'])
     ->name('reports.activities.destroy');
 
 
@@ -52,6 +52,8 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     // Account Management
     Route::resource('accounts', AdminAccountController::class);
     Route::patch('accounts/{user}/toggle-status', [AdminAccountController::class, 'toggleStatus'])->name('accounts.toggle-status');
+
+     Route::resource('units', App\Http\Controllers\Admin\UnitController::class);
 
     // Study Program Management
     Route::resource('study-programs', AdminStudyProgramController::class);

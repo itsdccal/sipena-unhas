@@ -187,10 +187,10 @@ foreach ($semesters as $semester) {
 
     // Style semester row
     $sheet->getStyle("A{$row}:G{$row}")->applyFromArray([
-        'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+        'font' => ['bold' => true, 'color' => ['rgb' => '000000']],
         'fill' => [
             'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-            'startColor' => ['rgb' => '4472C4'],
+            'startColor' => ['rgb' => 'C0BDD5'],
         ],
         'alignment' => [
             'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
@@ -204,18 +204,18 @@ foreach ($semesters as $semester) {
     foreach ($semester->reports as $report) {
         foreach ($report->activityDetails as $act) {
             $sheet->setCellValue("A{$row}", $act->activity_name ?? '-');
-            $sheet->setCellValue("B{$row}", $act->volume ?? 0);
-            $sheet->setCellValue("C{$row}", $act->unit_price ?? 0);
-            $sheet->setCellValue("D{$row}", $act->total ?? 0);
+            $sheet->setCellValue("B{$row}", (float)($act->volume ?? 0));
+            $sheet->setCellValue("C{$row}", (float)($act->unit_price ?? 0));
+            $sheet->setCellValue("D{$row}", (float)($act->total ?? 0));
             $sheet->setCellValue("E{$row}", $act->allocation ?? 0);
-            $sheet->setCellValue("F{$row}", $act->unit_cost ?? 0);
+            $sheet->setCellValue("F{$row}", (float)($act->unit_cost ?? 0));
             $sheet->setCellValue("G{$row}", $act->notes ?? '-');
 
             // Background biru muda untuk row aktivitas (opsional)
             $sheet->getStyle("A{$row}:G{$row}")->applyFromArray([
                 'fill' => [
                     'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                    'startColor' => ['rgb' => 'C0BDD5'],
+                    'startColor' => ['rgb' => 'FFFFFF'],
                 ],
             ]);
 

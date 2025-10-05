@@ -5,11 +5,9 @@ namespace App\Http\Controllers;
 use App\Exports\ReportExport;
 use App\Models\ActivityDetail;
 use App\Models\Report;
-use App\Models\Semester;
 use App\Models\StudyProgram;
+use App\Models\Semester;
 use App\Models\Unit;
-use Illuminate\Contracts\View\View;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,166 +15,161 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
 {
-public function index(Request $request): View
-{
-    // Get all reports for current user (grouped by study program implicitly)
-    $reports = Report::with([
-            'studyProgram.degree',
-            'semester',
-            'activityDetails.unit',
-        ])
-        ->where('user_id', Auth::id())
-        ->orderBy('created_at', 'asc')
-        ->get();
-
-    $studyPrograms = StudyProgram::all();
-    $semesters = Semester::orderBy('semester_name', 'desc')->get();
-    $units = Unit::where('is_active', true)->get();
-
-    return view('reports.index', compact('reports', 'studyPrograms', 'semesters', 'units'));
-}
-
-    public function create(): View
+    public function index()
     {
-        $studyPrograms = StudyProgram::all();
-        $semesters = Semester::all();
-        $units = Unit::where('is_active', true)->get();
+        $query = Report::with(['studyProgram.degree', 'semester', 'activityDetails.unit']);
 
-        return view('reports.create', compact('studyPrograms', 'semesters', 'units'));
-    }
-
-public function store(Request $request): RedirectResponse
-{
-    $validated = $request->validate([
-        'study_program_id' => ['required', 'exists:study_programs,id'],
-        'semester_id' => ['required', 'exists:semesters,id'],
-    ]);
-
-    // Create report dengan grand_total = 0 (belum ada activities)
-    $report = Report::create([
-        'study_program_id' => $validated['study_program_id'],
-        'semester_id' => $validated['semester_id'],
-        'user_id' => auth()->id(),
-        'grand_total' => 0,
-    ]);
-
-    // Redirect ke show page untuk tambah activities
-    return redirect()->route('reports.show', $report)
-        ->with('success', 'Report created successfully! Now add your activities.');
-}
-
-public function show(Report $report): View
-{
-    // Check authorization
-    if (Auth::user()->role !== 'admin' && $report->user_id !== Auth::id()) {
-        abort(403);
-    }
-
-    $report->load([
-        'studyProgram.degree',
-        'semester',
-        'user',
-        'activityDetails.unit',
-    ]);
-
-    $units = Unit::where('is_active', true)->get(); // ADD THIS
-
-    return view('reports.show', compact('report', 'units')); // UPDATE THIS
-}
-
-    public function edit(Report $report): View
-    {
-        // Check authorization
-        if (Auth::user()->role !== 'admin' && $report->user_id !== Auth::id()) {
-            abort(403);
+        // Filter by user role
+        if (Auth::user()->role === 'staff' && Auth::user()->study_program_id) {
+            $query->where('study_program_id', Auth::user()->study_program_id);
         }
 
-        $studyPrograms = StudyProgram::all();
-        $semesters = Semester::all();
-        $units = Unit::where('is_active', true)->get();
+        // Urutkan berdasarkan semester_id
+        $reports = $query->orderBy('semester_id', 'asc')->get();
 
-        $report->load([
-            'activityDetails.unit',
-            'activityDetails.subActivities'
-        ]);
+        // Data for modals
+        $studyPrograms = StudyProgram::with('degree')->get();
+        $semesters = Semester::orderBy('id', 'asc')->get();
+        $units = Unit::all();
 
-        return view('reports.edit', compact('report', 'studyPrograms', 'semesters', 'units'));
+        return view('reports.index', compact('reports', 'studyPrograms', 'semesters', 'units'));
     }
 
-    public function update(Request $request, Report $report): RedirectResponse
+    public function store(Request $request)
     {
-        // Check authorization
-        if (Auth::user()->role !== 'admin' && $report->user_id !== Auth::id()) {
-            abort(403);
-        }
-
-        $validated = $request->validate([
-            'study_program_id' => ['required', 'exists:study_programs,id'],
-            'semester_id' => ['required', 'exists:semesters,id'],
-            'grand_total' => ['required', 'numeric', 'min:0'],
-            'activities' => ['required', 'array', 'min:1'],
-            'activities.*.activity_name' => ['required', 'string', 'max:255'],
-            'activities.*.unit_id' => ['nullable', 'exists:units,id'],
-            'activities.*.volume' => ['required', 'numeric', 'min:0'],
-            'activities.*.unit_price' => ['required', 'numeric', 'min:0'],
-            'activities.*.total' => ['required', 'numeric', 'min:0'],
-            'activities.*.allocation' => ['nullable', 'integer', 'min:0'],
-            'activities.*.unit_cost' => ['nullable', 'numeric', 'min:0'],
-            'activities.*.notes' => ['nullable', 'string'],
-            'activities.*.sub_activities' => ['nullable', 'array'],
-            'activities.*.sub_activities.*.sub_activity_name' => ['required', 'string', 'max:255'],
-            'activities.*.sub_activities.*.volume' => ['required', 'numeric', 'min:0'],
-            'activities.*.sub_activities.*.unit_satuan' => ['nullable', 'string', 'max:50'],
-            'activities.*.sub_activities.*.unit_price' => ['required', 'numeric', 'min:0'],
-            'activities.*.sub_activities.*.total' => ['required', 'numeric', 'min:0'],
-            'activities.*.sub_activities.*.allocation' => ['nullable', 'integer', 'min:0'],
-            'activities.*.sub_activities.*.unit_cost' => ['nullable', 'numeric', 'min:0'],
+        $request->validate([
+            'study_program_id' => 'required|exists:study_programs,id',
+            'semester_id' => 'required|exists:semesters,id',
         ]);
 
-        DB::transaction(function () use ($report, $validated) {
-            $report->update([
-                'study_program_id' => $validated['study_program_id'],
-                'semester_id' => $validated['semester_id'],
-                'grand_total' => 0,
+        $report = Report::create([
+            'study_program_id' => $request->study_program_id,
+            'semester_id' => $request->semester_id, // Tambahkan ini
+            'grand_total' => 0, // Tambahkan ini
+            'user_id' => Auth::id(), // Ganti dari created_by ke user_id
+        ]);
+
+        return redirect()->route('reports.index')->with('success', 'Semester berhasil ditambahkan!');
+    }
+
+    public function storeActivity(Request $request, Report $report)
+    {
+        try {
+            $request->validate([
+                'activity_name' => 'required|string|max:255',
+                'unit_id' => 'required|exists:units,id',
+                'volume' => 'required|numeric|min:0',
+                'unit_price' => 'required|numeric|min:0',
+                'allocation' => 'nullable|numeric|min:0',
+                'notes' => 'nullable|string',
             ]);
 
-            // Delete old activities
-            $report->activityDetails()->delete();
+            $total = $request->volume * $request->unit_price;
+            $unit_cost = $request->allocation > 0 ? $total / $request->allocation : 0;
 
-            foreach ($validated['activities'] as $activityData) {
-                $activity = ActivityDetail::create([
-                    'report_id' => $report->id,
-                    'activity_name' => $activityData['activity_name'],
-                    'unit_id' => $activityData['unit_id'] ?? null,
-                    'calculation_type' => 'manual',
-                    'volume' => $activityData['volume'],
-                    'unit_price' => $activityData['unit_price'],
-                    'total' => $activityData['total'],
-                    'allocation' => $activityData['allocation'] ?? null,
-                    'unit_cost' => $activityData['unit_cost'] ?? 0,
-                    'notes' => $activityData['notes'] ?? null,
-                ]);
+            $activity = $report->activityDetails()->create([
+                'activity_name' => $request->activity_name,
+                'unit_id' => $request->unit_id,
+                'volume' => $request->volume,
+                'unit_price' => $request->unit_price,
+                'total' => $total,
+                'allocation' => $request->allocation ?? 0,
+                'unit_cost' => $unit_cost,
+                'notes' => $request->notes,
+            ]);
 
-            }
+            // Update grand total
+            $grandTotal = $report->activityDetails()->sum('total');
+            $report->update(['grand_total' => $grandTotal]);
 
-            $report->recalculateGrandTotal();
-        });
+            return response()->json([
+                'success' => true,
+                'message' => 'Activity berhasil ditambahkan!',
+                'activity' => $activity->load('unit')
+            ]);
 
-        return redirect()->route('reports.index')
-            ->with('success', 'Report updated successfully!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data tidak valid',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            \Log::error('Error creating activity: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan server: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
-    public function destroy(Report $report): RedirectResponse
+    public function updateActivity(Request $request, ActivityDetail $activity)
     {
-        // Check authorization
-        if (Auth::user()->role !== 'admin' && $report->user_id !== Auth::id()) {
-            abort(403);
+        try {
+            $request->validate([
+                'activity_name' => 'required|string|max:255',
+                'unit_id' => 'required|exists:units,id',
+                'volume' => 'required|numeric|min:0',
+                'unit_price' => 'required|numeric|min:0',
+                'allocation' => 'nullable|numeric|min:0',
+                'notes' => 'nullable|string',
+            ]);
+
+            $total = $request->volume * $request->unit_price;
+            $unit_cost = $request->allocation > 0 ? $total / $request->allocation : 0;
+
+            $activity->update([
+                'activity_name' => $request->activity_name,
+                'unit_id' => $request->unit_id,
+                'volume' => $request->volume,
+                'unit_price' => $request->unit_price,
+                'total' => $total,
+                'allocation' => $request->allocation ?? 0,
+                'unit_cost' => $unit_cost,
+                'notes' => $request->notes,
+            ]);
+
+            // Update grand total
+            $report = $activity->report;
+            $grandTotal = $report->activityDetails()->sum('total');
+            $report->update(['grand_total' => $grandTotal]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Activity berhasil diupdate!',
+                'activity' => $activity->load('unit')
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error updating activity: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan server: ' . $e->getMessage()
+            ], 500);
         }
+    }
 
+    public function destroyActivity(ActivityDetail $activity)
+    {
+        $report = $activity->report;
+        $activity->delete();
+
+        // Update grand total
+        $this->updateReportGrandTotal($report);
+
+        return redirect()->route('reports.index')->with('success', 'Activity berhasil dihapus!');
+    }
+
+    public function destroy(Report $report)
+    {
         $report->delete();
+        return redirect()->route('reports.index')->with('success', 'Semester berhasil dihapus!');
+    }
 
-        return redirect()->route('reports.index')
-            ->with('success', 'Report deleted successfully!');
+    private function updateReportGrandTotal(Report $report)
+    {
+        $grandTotal = $report->activityDetails()->sum('total');
+        $report->update(['grand_total' => $grandTotal]);
     }
 
     public function export()

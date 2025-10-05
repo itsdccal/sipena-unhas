@@ -10,7 +10,7 @@
             <!-- Header -->
             <div class="mb-6 flex items-center justify-between">
                 <div>
-                    <h2 class="text-3xl font-bold text-gray-900">Master Data</h2>
+                    <h2 class="text-3xl font-bold text-gray-900">Data Akademik</h2>
                     <p class="mt-1 text-sm text-gray-600">Kelola data fakultas, jenjang, dan program studi</p>
                 </div>
                 <a href="{{ route('admin.study-programs.create') }}"
@@ -45,7 +45,7 @@
                 </div>
             @endif
 
-            
+
 
     <div class="inline-flex rounded-md shadow-xs mb-5 shadow-sm" role="group">
         <a href="{{ route('admin.faculties.index') }}" class="px-4 py-2 text-sm font-medium cursor-pointer text-gray-500 bg-gray-200 rounded-s-lg border-gray-200 hover:bg-white hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700">
@@ -59,7 +59,7 @@
         </a>
 
     </div>
-  
+
 
 
             <!-- Filters -->
@@ -159,7 +159,7 @@
                                                     Edit
                                                 </a>
                                                 @if($program->users->count() == 0 && $program->reports->count() == 0)
-                                                
+
                                                 <form method="POST" action="{{ route('admin.study-programs.destroy', $program) }}"
                                                     onsubmit="return confirm('Are you sure you want to delete this study program?');"
                                                     class="inline">
@@ -187,17 +187,8 @@
                         <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                         </svg>
-                        <h3 class="mt-2 text-sm font-medium text-gray-900">No study programs found</h3>
-                        <p class="mt-1 text-sm text-gray-500">Get started by creating a new study program.</p>
-                        <div class="mt-6">
-                            <a href="{{ route('admin.study-programs.create') }}"
-                                class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                </svg>
-                                Add Study Program
-                            </a>
-                        </div>
+                        <h3 class="mt-2 text-sm font-medium text-gray-900">Program Studi Tidak Ditemukan</h3>
+                        <p class="mt-1 text-sm text-gray-500">Coba sesuaikan filter atau tambahkan data program studi baru.</p>
                     </div>
                 @endif
             </div>

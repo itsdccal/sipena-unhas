@@ -18,7 +18,7 @@ return new class extends Migration
             $table->enum('calculation_type', ['multiply', 'add', 'manual'])->default('multiply');
             $table->decimal('volume', 10, 2);
             $table->decimal('unit_price', 15, 2);
-            $table->decimal('total', 10, 2);
+            $table->decimal('total', 20, 2);
             $table->integer('allocation')->default(15);
             $table->decimal('unit_cost', 10, 2);
             $table->text('notes')->nullable();
