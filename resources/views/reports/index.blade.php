@@ -104,7 +104,9 @@
                                 </button>
                             </form>
                         </div>
-
+                        {{ Auth::user()->studyProgram->sp_name }}
+                        {{ Auth::user()->studyProgram->faculty->faculty_name }}
+                        {{ Auth::user()->studyProgram->degree->degree_name }}
                         <!-- Activities Table -->
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200 text-sm">
