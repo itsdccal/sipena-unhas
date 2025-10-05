@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Report;
 use App\Models\StudyProgram;
+use App\Models\Faculty;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -42,6 +43,8 @@ class HomeController extends Controller
             ->count();
 
         $totalStudyPrograms = StudyProgram::count();
+        $totalFaculties = Faculty::count();
+
 
         // SESUAIKAN dengan kolom yang benar di database
         $totalCost = Report::sum('grand_total');
@@ -57,25 +60,24 @@ class HomeController extends Controller
             ->limit(5)
             ->get();
 
-        // Reports by Period (menggunakan semester sebagai period)
-        // PERBAIKAN: Gunakan semester sebagai "period"
-        $reportsByPeriod = Report::select(
-                'semesters.semester_name as period',
-                DB::raw('count(*) as count')
-            )
-            ->join('semesters', 'reports.semester_id', '=', 'semesters.id')
-            ->groupBy('semesters.semester_name')
-            ->orderByDesc('count')
-            ->limit(6)
-            ->get();
+        $reportsByFaculty = Report::select(
+            'faculties.faculty_name as faculty',
+            DB::raw('count(*) as count')
+        )
+        ->join('study_programs', 'reports.study_program_id', '=', 'study_programs.id')
+        ->join('faculties', 'study_programs.faculty_id', '=', 'faculties.id')
+        ->groupBy('faculties.faculty_name')
+        ->orderByDesc('count')
+        ->get();
 
         return view('dashboard.admin', compact(
             'totalReports',
             'totalUsers',
             'totalStudyPrograms',
+            'totalFaculties',
             'totalCost',
             'reportsByStudyProgram',
-            'reportsByPeriod'
+            'reportsByFaculty'
         ));
     }
 
