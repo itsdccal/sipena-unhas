@@ -35,9 +35,15 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('reports', ReportController::class);
 });
- // Activities for Report
-    Route::post('reports/{report}/activities', [ActivityDetailController::class, 'store'])
-        ->name('reports.activities.store');
+// Activities for Report
+Route::post('reports/{report}/activities', [ActivityDetailController::class, 'store'])
+    ->name('reports.activities.store');
+
+Route::put('reports/activities/{activity}', [ActivityDetailController::class, 'update'])
+    ->name('reports.activities.update');
+
+Route::delete('reports/activities/{activity}', [ActivityDetailController::class, 'destroy'])
+    ->name('reports.activities.destroy');
 
     // Sub Activities for Activity
     Route::post('reports/activities/{activity}/sub-activities', [SubActivityDetailController::class, 'store'])
@@ -59,7 +65,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     // Faculty Management
     Route::resource('faculties', AdminFacultyController::class);
     Route::patch('faculties/{faculty}/toggle-status', [AdminFacultyController::class, 'toggleStatus'])->name('faculties.toggle-status');
-    
+
     Route::resource('degrees', AdminDegreeController::class);
     Route::patch('degrees/{degree}/toggle-status', [AdminFacultyController::class, 'toggleStatus'])->name('degrees.toggle-status');
 

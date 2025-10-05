@@ -19,23 +19,22 @@ class ReportController extends Controller
 {
 public function index(Request $request): View
 {
-    $query = Report::with(['studyProgram', 'semester', 'user']);
-
-    // Regular users only see their own reports
-    if (Auth::user()->role !== 'admin') {
-        $query->where('user_id', Auth::id());
-    }
-
-    // Order by academic year descending, then by semester
-    $reports = $query->join('semesters', 'reports.semester_id', '=', 'semesters.id')
-        ->orderBy('semesters.semester_name', 'asc')
-        ->select('reports.*')
+    // Get all reports for current user (grouped by study program implicitly)
+    $reports = Report::with([
+            'studyProgram.degree',
+            'semester',
+            'activityDetails.unit',
+            'activityDetails.subActivities'
+        ])
+        ->where('user_id', Auth::id())
+        ->orderBy('created_at', 'asc')
         ->get();
 
     $studyPrograms = StudyProgram::all();
     $semesters = Semester::orderBy('semester_name', 'desc')->get();
+    $units = Unit::where('is_active', true)->get();
 
-    return view('reports.index', compact('reports', 'studyPrograms', 'semesters'));
+    return view('reports.index', compact('reports', 'studyPrograms', 'semesters', 'units'));
 }
 
     public function create(): View
