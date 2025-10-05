@@ -58,6 +58,8 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::resource('accounts', AdminAccountController::class);
     Route::patch('accounts/{user}/toggle-status', [AdminAccountController::class, 'toggleStatus'])->name('accounts.toggle-status');
 
+     Route::resource('units', App\Http\Controllers\Admin\UnitController::class);
+     
     // Study Program Management
     Route::resource('study-programs', AdminStudyProgramController::class);
     Route::patch('study-programs/{study_program}/toggle-status', [AdminStudyProgramController::class, 'toggleStatus'])->name('study-programs.toggle-status');

@@ -10,11 +10,7 @@ return new class extends Migration
     {
         Schema::create('units', function (Blueprint $table) {
             $table->id();
-            $table->string('code', 10)->unique();
             $table->string('name', 20);
-            $table->json('suggested_fields')->nullable();
-            $table->text('description')->nullable();
-            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

@@ -8,7 +8,8 @@
             <!-- Activity Name -->
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 mb-2">
-                    Activity Namedsdsdsd <span class="text-red-500">*</span>
+                    Activity Name <span class="text-red-500">*</span>
+
                 </label>
                 <input type="text" name="activity_name" x-model="activity.activity_name" required
                     class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
@@ -21,7 +22,7 @@
                     <select name="unit_id" x-model="activity.unit_id" required class="w-full border-gray-300 rounded text-sm">
                         <option value="">Select Unit</option>
                         @foreach($units as $unit)
-                            <option value="{{ $unit->id }}">{{ $unit->code }}</option>
+                            <option value="{{ $unit->id }}">{{ $unit->name }}</option>
                         @endforeach
                     </select>
                 </div>

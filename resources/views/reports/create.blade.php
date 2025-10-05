@@ -76,13 +76,6 @@
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
 
-                                <!-- Display Academic Year -->
-                                <div x-show="academicYear" class="mt-2 p-2 bg-blue-50 rounded-md border border-blue-200">
-                                    <p class="text-sm text-blue-700">
-                                        <span class="font-semibold">Academic Year:</span>
-                                        <span x-text="academicYear" class="font-bold"></span>
-                                    </p>
-                                </div>
                             </div>
                         </div>
                     </div>

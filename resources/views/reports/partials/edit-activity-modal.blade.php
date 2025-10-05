@@ -22,7 +22,7 @@
                     <select name="unit_id" x-model="editActivity.unit_id" required class="w-full border-gray-300 rounded text-sm">
                         <option value="">Select Unit</option>
                         @foreach($units as $unit)
-                            <option value="{{ $unit->id }}">{{ $unit->code }}</option>
+                            <option value="{{ $unit->id }}">{{ $unit->name }}</option>
                         @endforeach
                     </select>
                 </div>
