@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminAccountController;
+use App\Http\Controllers\Admin\AdminDegreeController;
 use App\Http\Controllers\Admin\AdminFacultyController;
 use App\Http\Controllers\Admin\AdminReportController;
 use App\Http\Controllers\Admin\AdminSemesterController;
@@ -58,6 +59,9 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     // Faculty Management
     Route::resource('faculties', AdminFacultyController::class);
     Route::patch('faculties/{faculty}/toggle-status', [AdminFacultyController::class, 'toggleStatus'])->name('faculties.toggle-status');
+    
+    Route::resource('degrees', AdminDegreeController::class);
+    Route::patch('degrees/{degree}/toggle-status', [AdminFacultyController::class, 'toggleStatus'])->name('degrees.toggle-status');
 
     // Semester Management
     Route::resource('semesters', AdminSemesterController::class);
