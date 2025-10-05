@@ -63,7 +63,7 @@ class AdminStudyProgramController extends Controller
         StudyProgram::create($validated);
 
         return redirect()->route('admin.study-programs.index')
-            ->with('success', 'Study program created successfully!');
+            ->with('success', 'Data Program Studi berhasil ditambahkan!');
     }
 
     public function edit(StudyProgram $studyProgram): View
@@ -86,7 +86,7 @@ class AdminStudyProgramController extends Controller
         $studyProgram->update($validated);
 
         return redirect()->route('admin.study-programs.index')
-            ->with('success', 'Study program updated successfully!');
+            ->with('success', 'Data Program Studi berhasil diubah!');
     }
 
     public function destroy(StudyProgram $studyProgram): RedirectResponse
@@ -100,6 +100,6 @@ class AdminStudyProgramController extends Controller
         $studyProgram->delete();
 
         return redirect()->route('admin.study-programs.index')
-            ->with('success', 'Study program deleted successfully!');
+            ->with('success', 'Data Program Studi berhasil dihapus!');
     }
 }

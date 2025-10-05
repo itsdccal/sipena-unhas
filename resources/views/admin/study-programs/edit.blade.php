@@ -33,7 +33,7 @@
                                 value="{{ old('sp_code', $studyProgram->sp_code) }}"
                                 required
                                 maxlength="10"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('sp_code') border-red-500 @enderror">
+                                class="mt-1 block w-full rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('sp_code') border-red-500 @enderror">
                             @error('sp_code')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -50,7 +50,7 @@
                                 id="sp_name"
                                 value="{{ old('sp_name', $studyProgram->sp_name) }}"
                                 required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('sp_name') border-red-500 @enderror">
+                                class="mt-1 block w-full rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('sp_name') border-red-500 @enderror">
                             @error('sp_name')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -64,7 +64,7 @@
                             <select name="faculty_id"
                                 id="faculty_id"
                                 required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('faculty_id') border-red-500 @enderror">
+                                class="mt-1 block w-full rounded-md  shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('faculty_id') border-red-500 @enderror">
                                 <option value="">Select Faculty</option>
                                 @foreach($faculties as $faculty)
                                     <option value="{{ $faculty->id }}"
@@ -86,7 +86,7 @@
                             <select name="degree_id"
                                 id="degree_id"
                                 required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('degree_id') border-red-500 @enderror">
+                                class="mt-1 block w-full rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('degree_id') border-red-500 @enderror">
                                 <option value="">Select Degree</option>
                                 @foreach($degrees as $degree)
                                     <option value="{{ $degree->id }}"
