@@ -20,6 +20,8 @@ class DatabaseSeeder extends Seeder
             DegreeSeeder::class,
             StudyProgramSeeder::class,
             UsersSeeder::class,
+            SemesterSeeder::class,
+            UnitSeeder::class,
         ]);
     }
 }
