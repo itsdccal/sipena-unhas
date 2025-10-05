@@ -36,21 +36,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('reports', ReportController::class);
 });
 // Activities for Report
-Route::post('reports/{report}/activities', [ActivityDetailController::class, 'store'])
+Route::post('reports/{report}/activities', [ReportController::class, 'storeActivity'])
     ->name('reports.activities.store');
 
-Route::put('reports/activities/{activity}', [ActivityDetailController::class, 'update'])
+Route::put('reports/activities/{activity}', [ReportController::class, 'updateActivity'])
     ->name('reports.activities.update');
 
-Route::delete('reports/activities/{activity}', [ActivityDetailController::class, 'destroy'])
+Route::delete('reports/activities/{activity}', [ReportController::class, 'destroyActivity'])
     ->name('reports.activities.destroy');
 
     // Sub Activities for Activity
-    Route::post('reports/activities/{activity}/sub-activities', [SubActivityDetailController::class, 'store'])
-        ->name('reports.activities.sub-activities.store');
+    // Route::post('reports/activities/{activity}/sub-activities', [SubActivityDetailController::class, 'store'])
+    //     ->name('reports.activities.sub-activities.store');
 
-    Route::delete('reports/sub-activities/{subActivity}', [SubActivityDetailController::class, 'destroy'])
-        ->name('reports.sub-activities.destroy');
+    // Route::delete('reports/sub-activities/{subActivity}', [SubActivityDetailController::class, 'destroy'])
+    //     ->name('reports.sub-activities.destroy');
 
 // Admin Routes
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -59,7 +59,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::patch('accounts/{user}/toggle-status', [AdminAccountController::class, 'toggleStatus'])->name('accounts.toggle-status');
 
      Route::resource('units', App\Http\Controllers\Admin\UnitController::class);
-     
+
     // Study Program Management
     Route::resource('study-programs', AdminStudyProgramController::class);
     Route::patch('study-programs/{study_program}/toggle-status', [AdminStudyProgramController::class, 'toggleStatus'])->name('study-programs.toggle-status');

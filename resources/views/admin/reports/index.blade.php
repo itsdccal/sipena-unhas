@@ -13,14 +13,19 @@
                     <h2 class="text-3xl font-bold text-gray-900">Manajemen Laporan</h2>
                     <p class="mt-1 text-sm text-gray-600">Lihat dan kelola semua laporan sistem</p>
                 </div>
-                <a href="{{ route('admin.units.index') }}"
-                    class="inline-flex items-center px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-md text-sm font-medium text-yellow-700 hover:bg-yellow-100 hover:border-yellow-300 transition-colors">
-                    <svg class="w-4 h-4 mr-2 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                    </svg>
-                    Kelola Satuan
-                </a>
+
+                <div class="flex items-center gap-3">
+                    <a href="{{ route('admin.units.index') }}"
+                        class="inline-flex items-center px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-md text-sm font-medium text-yellow-700 hover:bg-yellow-100 hover:border-yellow-300 transition-colors">
+                        <svg class="w-4 h-4 mr-2 text-yellow-600" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                        Kelola Satuan
+                    </a>
+
+                </div>
             </div>
 
             <!-- Flash Messages -->

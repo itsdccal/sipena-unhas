@@ -26,7 +26,7 @@
                 <select name="semester_id" required class="w-full border-gray-300 rounded">
                     <option value="">Select</option>
                     @foreach($semesters as $semester)
-                        <option value="{{ $semester->id }}">{{ $semester->semester_name }} - {{ $semester->academic_year }}</option>
+                        <option value="{{ $semester->id }}">{{ $semester->semester_name }}</option>
                     @endforeach
                 </select>
             </div>

@@ -1,17 +1,18 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Laporan</h2>
-            <button type="button" x-data @click="$dispatch('open-modal', 'add-semester-modal')"
-                class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700">
-                + Tambah Semester
-            </button>
-        </div>
-    </x-slot>
 
     <div class="py-12" x-data="reportPage()">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight"></h2>
+                <button type="button" @click="$dispatch('open-modal', 'add-semester-modal')"
+                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Tambah Semester
+                </button>
+            </div>
             @if (session('success'))
                 <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded">
                     <p class="text-sm text-green-800">{{ session('success') }}</p>
@@ -151,7 +152,7 @@
                                                 {{ $activity->activity_name }}</td>
                                             <td class="px-4 py-3 border-r text-sm text-right">
                                                 {{ number_format($activity->volume, 1) }}</td>
-                                            <td class="px-4 py-3 border-r text-sm">{{ $activity->unit->code ?? '-' }}
+                                            <td class="px-4 py-3 border-r text-sm">{{ $activity->unit->name ?? '-' }}
                                             </td>
                                             <td class="px-4 py-3 border-r text-sm text-right">
                                                 {{ number_format($activity->unit_price, 0, ',', '.') }}</td>
@@ -200,7 +201,7 @@
                                         </tr>
 
                                         <!-- Sub Activities -->
-                                        @foreach ($activity->subActivities ?? [] as $sub)
+                                        {{-- @foreach ($activity->subActivities ?? [] as $sub)
                                             <tr class="bg-blue-50 hover:bg-blue-100">
                                                 <td class="px-4 py-3 border-r text-sm"></td>
                                                 <td class="px-4 py-3 border-r text-sm pl-8 italic">
@@ -237,7 +238,7 @@
                                                     </form>
                                                 </td>
                                             </tr>
-                                        @endforeach
+                                        @endforeach --}}
                                     @empty
                                         <tr>
                                             <td colspan="10" class="px-4 py-8 text-center text-sm text-gray-500">
@@ -280,6 +281,7 @@
                 return {
                     currentReportId: null,
                     currentActivityId: null,
+                    loading: false,
 
                     // Activity Form Data
                     activity: {
@@ -305,17 +307,6 @@
                         notes: ''
                     },
 
-                    // Sub Activity Form Data
-                    sub: {
-                        name: '',
-                        volume: 0,
-                        unit: '',
-                        price: 0,
-                        total: 0,
-                        allocation: 0,
-                        unit_cost: 0
-                    },
-
                     openAddActivityModal(reportId) {
                         this.currentReportId = reportId;
                         this.activity = {
@@ -334,55 +325,133 @@
                     openEditActivityModal(activityId, activityData) {
                         this.currentActivityId = activityId;
                         this.editActivity = {
-                            activity_name: activityData.activity_name,
-                            unit_id: activityData.unit_id,
-                            volume: parseFloat(activityData.volume),
-                            unit_price: parseFloat(activityData.unit_price),
-                            total: parseFloat(activityData.total),
-                            allocation: activityData.allocation || 0,
-                            unit_cost: parseFloat(activityData.unit_cost),
+                            activity_name: activityData.activity_name || '',
+                            unit_id: activityData.unit_id || '',
+                            volume: parseFloat(activityData.volume) || 0,
+                            unit_price: parseFloat(activityData.unit_price) || 0,
+                            total: parseFloat(activityData.total) || 0,
+                            allocation: parseFloat(activityData.allocation) || 0,
+                            unit_cost: parseFloat(activityData.unit_cost) || 0,
                             notes: activityData.notes || ''
                         };
                         this.$dispatch('open-modal', 'edit-activity-modal');
                     },
 
-                    openAddSubModal(activityId) {
-                        this.currentActivityId = activityId;
-                        this.sub = {
-                            name: '',
+                    async submitActivity() {
+                        if (!this.currentReportId) {
+                            alert('Report ID tidak ditemukan');
+                            return;
+                        }
+
+                        this.loading = true;
+                        const formData = new FormData(document.getElementById('addActivityForm'));
+
+                        try {
+                            const response = await fetch(`/reports/${this.currentReportId}/activities`, {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                        'content'),
+                                    'Accept': 'application/json'
+                                }
+                            });
+
+                            const data = await response.json();
+
+                            if (response.ok && data.success) {
+                                // Gunakan close-modal yang sama seperti add-semester
+                                this.$dispatch('close-modal', 'add-activity-modal');
+                                location.reload();
+                            } else {
+                                console.error('Server response:', data);
+                                alert(data.message || 'Terjadi kesalahan saat menyimpan');
+                            }
+                        } catch (error) {
+                            console.error('Network error:', error);
+                            alert('Terjadi kesalahan jaringan');
+                        } finally {
+                            this.loading = false;
+                        }
+                    },
+
+                    async submitEditActivity() {
+                        if (!this.currentActivityId) {
+                            alert('Activity ID tidak ditemukan');
+                            return;
+                        }
+
+                        this.loading = true;
+                        const formData = new FormData(document.getElementById('editActivityForm'));
+                        formData.append('_method', 'PUT');
+
+                        try {
+                            const response = await fetch(`/reports/activities/${this.currentActivityId}`, {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                        'content'),
+                                    'Accept': 'application/json'
+                                }
+                            });
+
+                            const data = await response.json();
+
+                            if (response.ok && data.success) {
+                                // Gunakan close-modal yang sama seperti add-semester
+                                this.$dispatch('close-modal', 'edit-activity-modal');
+                                location.reload();
+                            } else {
+                                console.error('Server response:', data);
+                                alert(data.message || 'Terjadi kesalahan saat mengupdate');
+                            }
+                        } catch (error) {
+                            console.error('Network error:', error);
+                            alert('Terjadi kesalahan jaringan');
+                        } finally {
+                            this.loading = false;
+                        }
+                    },
+
+                    closeModal() {
+                        // Reset form data
+                        this.activity = {
+                            activity_name: '',
+                            unit_id: '',
                             volume: 0,
-                            unit: '',
-                            price: 0,
+                            unit_price: 0,
                             total: 0,
                             allocation: 0,
-                            unit_cost: 0
+                            unit_cost: 0,
+                            notes: ''
                         };
-                        this.$dispatch('open-modal', 'add-sub-activity-modal');
+
+                        // Close modal
+                        this.$dispatch('close');
                     },
 
                     calculateActivity() {
-                        this.activity.total = this.activity.volume * this.activity.unit_price;
-                        this.activity.unit_cost = this.activity.allocation > 0 ?
-                            this.activity.total / this.activity.allocation :
-                            0;
+                        const volume = parseFloat(this.activity.volume) || 0;
+                        const unitPrice = parseFloat(this.activity.unit_price) || 0;
+                        const allocation = parseFloat(this.activity.allocation) || 0;
+
+                        this.activity.total = volume * unitPrice;
+                        this.activity.unit_cost = allocation > 0 ? this.activity.total / allocation : 0;
                     },
 
                     calculateEditActivity() {
-                        this.editActivity.total = this.editActivity.volume * this.editActivity.unit_price;
-                        this.editActivity.unit_cost = this.editActivity.allocation > 0 ?
-                            this.editActivity.total / this.editActivity.allocation :
-                            0;
-                    },
+                        const volume = parseFloat(this.editActivity.volume) || 0;
+                        const unitPrice = parseFloat(this.editActivity.unit_price) || 0;
+                        const allocation = parseFloat(this.editActivity.allocation) || 0;
 
-                    calculateSub() {
-                        this.sub.total = this.sub.volume * this.sub.price;
-                        this.sub.unit_cost = this.sub.allocation > 0 ?
-                            this.sub.total / this.sub.allocation :
-                            0;
+                        this.editActivity.total = volume * unitPrice;
+                        this.editActivity.unit_cost = allocation > 0 ? this.editActivity.total / allocation : 0;
                     },
 
                     formatCurrency(val) {
-                        return 'Rp ' + new Intl.NumberFormat('id-ID').format(val || 0);
+                        const value = parseFloat(val) || 0;
+                        return 'Rp ' + new Intl.NumberFormat('id-ID').format(value);
                     }
                 }
             }
