@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ActivityComponent;
 use App\Models\ActivityDetail;
 use App\Models\Report;
 use App\Models\Semester;
 use App\Models\StudyProgram;
-use App\Models\SubActivityDetail;
 use App\Models\Unit;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -24,7 +22,6 @@ public function index(Request $request): View
             'studyProgram.degree',
             'semester',
             'activityDetails.unit',
-            'activityDetails.subActivities'
         ])
         ->where('user_id', Auth::id())
         ->orderBy('created_at', 'asc')
@@ -78,7 +75,6 @@ public function show(Report $report): View
         'semester',
         'user',
         'activityDetails.unit',
-        'activityDetails.subActivities'
     ]);
 
     $units = Unit::where('is_active', true)->get(); // ADD THIS
@@ -159,20 +155,6 @@ public function show(Report $report): View
                     'notes' => $activityData['notes'] ?? null,
                 ]);
 
-                if (!empty($activityData['sub_activities'])) {
-                    foreach ($activityData['sub_activities'] as $subActivityData) {
-                        SubActivityDetail::create([
-                            'activity_detail_id' => $activity->id,
-                            'sub_activity_name' => $subActivityData['sub_activity_name'],
-                            'volume' => $subActivityData['volume'],
-                            'unit_satuan' => $subActivityData['unit_satuan'] ?? null,
-                            'unit_price' => $subActivityData['unit_price'],
-                            'total' => $subActivityData['total'],
-                            'allocation' => $subActivityData['allocation'] ?? null,
-                            'unit_cost' => $subActivityData['unit_cost'] ?? 0,
-                        ]);
-                    }
-                }
             }
 
             $report->recalculateGrandTotal();

@@ -120,7 +120,7 @@
                                     <button type="button"
                                         @click="$dispatch('open-modal', 'add-activity-modal')"
                                         class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700">
-                                        + Add Activity
+                                        + Add Activityd
                                     </button>
                                 </td>
                             </tr>

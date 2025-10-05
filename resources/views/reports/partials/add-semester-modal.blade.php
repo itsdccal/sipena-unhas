@@ -5,15 +5,18 @@
             @csrf
 
             @if($reports->isEmpty())
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2">Study Program *</label>
-                    <select name="study_program_id" required class="w-full border-gray-300 rounded">
-                        <option value="">Select</option>
-                        @foreach($studyPrograms as $program)
-                            <option value="{{ $program->id }}">{{ $program->sp_code }} - {{ $program->sp_name }}</option>
-                        @endforeach
-                    </select>
-                </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium mb-2">Study Program *</label>
+                <select name="study_program_id" required class="w-full border-gray-300 rounded">
+                    <option value="">Select</option>
+                    @foreach($studyPrograms as $program)
+                        <option value="{{ $program->id }}"
+                            {{ auth()->user()->study_program_id == $program->id ? 'selected' : '' }}>
+                            {{ $program->sp_code }} - {{ $program->sp_name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
             @else
                 <input type="hidden" name="study_program_id" value="{{ $reports->first()->study_program_id }}">
             @endif
