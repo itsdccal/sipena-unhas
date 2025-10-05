@@ -195,13 +195,6 @@
                                                         </button>
                                                     </form>
 
-                                                    <!-- Add Sub Activity Button  -->
-                                                    <button type="button"
-                                                        @click="openAddSubModal({{ $activity->id }})"
-                                                        class="px-2 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700"
-                                                        title="Add Sub Activity">
-                                                        + Sub
-                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -257,7 +250,7 @@
                                     <tr class="bg-gray-50">
                                         <td colspan="10" class="px-4 py-4 text-center">
                                             <button type="button" @click="openAddActivityModal({{ $report->id }})"
-                                                class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700">
+                                                class="inline-flex items-center px-4 py-2 bg-blue-100 text-white text-sm font-medium rounded hover:bg-blue-700">
                                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"

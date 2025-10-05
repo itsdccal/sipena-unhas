@@ -41,15 +41,8 @@ class ActivityDetail extends Model
         return $this->belongsTo(Unit::class);
     }
 
-    public function subActivities(): BelongsTo
-    {
-        return $this->belongsTo(SubActivity::class);
-    }
 
-    public function components(): HasMany
-    {
-        return $this->hasMany(ActivityComponent::class)->orderBy('display_order');
-    }
+
 
     // Calculate volume dari components
     public function calculateVolume(): float
@@ -96,12 +89,6 @@ class ActivityDetail extends Model
     public function getUnitName(): string
     {
         return $this->unit ? $this->unit->name : '-';
-    }
-
-    // Get sub activity name
-    public function getSubActivityName(): string
-    {
-        return $this->subActivity ? $this->subActivity->name : '-';
     }
 
     // Format currency helper
