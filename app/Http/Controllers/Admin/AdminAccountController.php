@@ -23,13 +23,13 @@ class AdminAccountController extends Controller
             $search = $request->input('search');
             $query->where(function ($q) use ($search): void {
                 $q->where('name', 'like', '%' . $search . '%')
-                  ->orWhere('nip', 'like', '%' . $search . '%'); // GANTI email jadi nip
+                  ->orWhere('nip', 'like', '%' . $search . '%'); 
             });
         }
 
         // Filter by Role
         if ($request->filled('role')) {
-            $query->where('role', $request->input('role'));
+            $query->where('role', $request->role);
         }
 
         // Filter by Study Program
@@ -39,8 +39,7 @@ class AdminAccountController extends Controller
 
         // Filter by Status
         if ($request->filled('status')) {
-            $isActive = $request->input('status') === 'active';
-            $query->where('status', $isActive); // GANTI is_active jadi status
+            $query->where('status', $request->status); // GANTI is_active jadi status
         }
 
         $users = $query->latest()->paginate(15);
@@ -76,7 +75,7 @@ class AdminAccountController extends Controller
             'password' => Hash::make($validated['password']),
             'role' => $validated['role'],
             'study_program_id' => $validated['study_program_id'] ?? null,
-            'status' => $validated['status'] ?? true, // GANTI is_active jadi status
+            'status' => $validated['status'] // GANTI is_active jadi status
         ]);
 
         return redirect()->route('admin.accounts.index')
@@ -104,10 +103,10 @@ class AdminAccountController extends Controller
 
         $data = [
             'name' => $validated['name'],
-            'nip' => $validated['nip'], // GANTI email jadi nip
+            'nip' => $validated['nip'], 
             'role' => $validated['role'],
             'study_program_id' => $validated['study_program_id'] ?? null,
-            'status' => $validated['status'] ?? true, // GANTI is_active jadi status
+            'status' => $validated['status']
         ];
 
         if (!empty($validated['password'])) {
@@ -117,7 +116,7 @@ class AdminAccountController extends Controller
         $account->update($data);
 
         return redirect()->route('admin.accounts.index')
-            ->with('success', 'User updated successfully!');
+            ->with('success', 'Akun berhasil diperbarui!');
     }
 
     public function destroy(User $account): RedirectResponse
@@ -130,12 +129,12 @@ class AdminAccountController extends Controller
         $account->delete();
 
         return redirect()->route('admin.accounts.index')
-            ->with('success', 'User deleted successfully!');
+            ->with('success', 'Akun berhasil dihapus!');
     }
 
     public function toggleStatus(User $account): RedirectResponse
     {
-        if ($account->id === auth()->id()) {
+        if ($account->id === auth()->id) {
             return redirect()->back()
                 ->with('error', 'You cannot deactivate your own account!');
         }
