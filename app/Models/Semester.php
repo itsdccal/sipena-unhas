@@ -10,7 +10,6 @@ class Semester extends Model
     protected $fillable = [
         'semester_code',
         'semester_name',
-        'academic_year',
     ];
 
     public function reports(): HasMany

@@ -12,7 +12,6 @@ return new class extends Migration
             $table->id();
             $table->string('semester_code', 255)->unique();
             $table->string('semester_name', 255);
-            $table->string('academic_year', 10);
             $table->timestamps();
         });
     }

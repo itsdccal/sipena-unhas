@@ -10,7 +10,6 @@ class SubActivity extends Model
     protected $fillable = [
         'code',
         'name',
-        'category',
         'is_active',
     ];
 

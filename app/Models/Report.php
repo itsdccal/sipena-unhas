@@ -41,20 +41,10 @@ class Report extends Model
         return $this->hasMany(ActivityDetail::class);
     }
 
-    // Auto calculate grand total
+    // Recalculate grand total dari semua activity details
     public function recalculateGrandTotal(): void
     {
         $this->grand_total = $this->activityDetails()->sum('total');
-        $this->save();
-    }
-
-    // Observer untuk auto-update grand_total
-    protected static function boot()
-    {
-        parent::boot();
-
-        static::created(function ($report) {
-            $report->recalculateGrandTotal();
-        });
+        $this->saveQuietly(); // Save tanpa trigger event lagi
     }
 }
