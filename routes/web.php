@@ -8,6 +8,8 @@ use App\Http\Controllers\Admin\AdminStudyProgramController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ActivityDetailController;
+use App\Http\Controllers\SubActivityDetailController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -32,6 +34,16 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('reports', ReportController::class);
 });
+ // Activities for Report
+    Route::post('reports/{report}/activities', [ActivityDetailController::class, 'store'])
+        ->name('reports.activities.store');
+
+    // Sub Activities for Activity
+    Route::post('reports/activities/{activity}/sub-activities', [SubActivityDetailController::class, 'store'])
+        ->name('reports.activities.sub-activities.store');
+
+    Route::delete('reports/sub-activities/{subActivity}', [SubActivityDetailController::class, 'destroy'])
+        ->name('reports.sub-activities.destroy');
 
 // Admin Routes
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {

@@ -1,96 +1,152 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('My Reports') }}
-        </h2>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">Reports</h2>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Header -->
             <div class="mb-6 flex items-center justify-between">
-                <div>
-                    <h2 class="text-3xl font-bold text-gray-900">My Reports</h2>
-                    <p class="mt-1 text-sm text-gray-600">Create and manage your reports</p>
-                </div>
-                <a href="{{ route('reports.create') }}"
-                    class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    Create Report
-                </a>
+                <h2 class="text-2xl font-bold text-gray-900">My Reports</h2>
+                <button type="button"
+                    x-data
+                    @click="$dispatch('open-modal', 'create-report')"
+                    class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700">
+                    + Create New Report
+                </button>
             </div>
 
-            <!-- Reports Table -->
-            <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
-                @if($reports->count() > 0)
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Program Type</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Study Program</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Semester</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grand Total</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                @foreach($reports as $report)
-                                    <tr class="hover:bg-gray-50">
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium text-gray-900">{{ $report->program_type }}</div>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <div class="text-sm text-gray-900">{{ $report->studyProgram->sp_name ?? 'N/A' }}</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-gray-900">{{ $report->semester->semester_name ?? 'N/A' }}</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium text-gray-900">
-                                                Rp {{ number_format($report->grand_total ?? 0, 0, ',', '.') }}
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {{ $report->created_at->format('d M Y') }}
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <a href="{{ route('reports.show', $report) }}" class="text-blue-600 hover:text-blue-900">
-                                                View
-                                            </a>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+            @if (session('success'))
+                <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded">
+                    <p class="text-sm text-green-800">{{ session('success') }}</p>
+                </div>
+            @endif
 
-                    <!-- Pagination -->
-                    <div class="px-6 py-4 border-t border-gray-200">
-                        {{ $reports->links() }}
-                    </div>
-                @else
-                    <div class="text-center py-12">
-                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <h3 class="mt-2 text-sm font-medium text-gray-900">No reports yet</h3>
-                        <p class="mt-1 text-sm text-gray-500">Get started by creating a new report.</p>
-                        <div class="mt-6">
-                            <a href="{{ route('reports.create') }}"
-                                class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                </svg>
-                                Create Report
-                            </a>
-                        </div>
-                    </div>
-                @endif
+            <!-- Reports Table -->
+            <div class="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Study Program</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Semester</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Grand Total</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Created</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @php
+                            $reportsByYear = $reports->groupBy(function($report) {
+                                return $report->semester->academic_year ?? 'Unknown';
+                            });
+                            $globalNo = 1;
+                        @endphp
+
+                        @forelse($reportsByYear as $academicYear => $yearReports)
+                            <!-- Academic Year Header Row -->
+                            <tr class="bg-blue-600">
+                                <td colspan="6" class="px-6 py-3 text-sm font-bold text-white">
+                                    ACADEMIC YEAR {{ $academicYear }}
+                                </td>
+                            </tr>
+
+                            <!-- Reports for this year -->
+                            @foreach($yearReports as $report)
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">{{ $globalNo++ }}</td>
+                                    <td class="px-6 py-4 text-sm">{{ $report->studyProgram->sp_name ?? '-' }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">{{ $report->semester->semester_name ?? '-' }}</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        Rp {{ number_format($report->grand_total ?? 0, 0, ',', '.') }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        {{ $report->created_at->format('d M Y') }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <a href="{{ route('reports.show', $report) }}"
+                                            class="text-blue-600 hover:text-blue-900 mr-3">
+                                            View
+                                        </a>
+                                        <form method="POST" action="{{ route('reports.destroy', $report) }}"
+                                            class="inline" onsubmit="return confirm('Delete this report?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="6" class="px-6 py-12 text-center text-sm text-gray-500">
+                                    No reports found. Click "Create New Report" to get started.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
+
+    <!-- Create Report Modal (Basic Info Only) -->
+    <x-modal name="create-report" maxWidth="md">
+        <div class="p-6">
+            <h2 class="text-lg font-semibold mb-4">Create New Report</h2>
+
+            <form method="POST" action="{{ route('reports.store') }}">
+                @csrf
+
+                <div class="space-y-4">
+                    <!-- Study Program -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Study Program <span class="text-red-500">*</span>
+                        </label>
+                        <select name="study_program_id" required
+                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <option value="">Select Study Program</option>
+                            @foreach($studyPrograms as $program)
+                                <option value="{{ $program->id }}">
+                                    {{ $program->sp_code }} - {{ $program->sp_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Semester -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Semester & Academic Year <span class="text-red-500">*</span>
+                        </label>
+                        <select name="semester_id" required
+                            class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            <option value="">Select Semester</option>
+                            @foreach($semesters as $semester)
+                                <option value="{{ $semester->id }}">
+                                    {{ $semester->semester_name }} - {{ $semester->academic_year }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Hidden grand_total (default 0) -->
+                    <input type="hidden" name="grand_total" value="0">
+                </div>
+
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button"
+                        @click="$dispatch('close-modal', 'create-report')"
+                        class="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded hover:bg-gray-300">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                        class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700">
+                        Create Report
+                    </button>
+                </div>
+            </form>
+        </div>
+    </x-modal>
 </x-app-layout>
