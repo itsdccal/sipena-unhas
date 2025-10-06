@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignId('semester_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('program_type', 20)->nullable();
-            $table->decimal('grand_total', 10, 2)->default(0);
+            $table->decimal('grand_total', 20, 2)->default(0);
             $table->timestamps();
         });
     }
