@@ -7,7 +7,7 @@
             @if($reports->isEmpty())
             <div class="mb-4">
                 <label class="block text-sm font-medium mb-2">Study Program *</label>
-                <select name="study_program_id" required class="w-full border-gray-300 rounded">
+                <select name="study_program_id" required class="w-full border-gray-300 rounded" disabled>
                     <option value="">Select</option>
                     @foreach($studyPrograms as $program)
                         <option value="{{ $program->id }}"

@@ -9,8 +9,8 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <!-- Welcome Section -->
             <div class="mb-8">
-                <h2 class="text-3xl font-bold text-gray-900">Welcome back, {{ auth()->user()->name }}!</h2>
-                <p class="mt-1 text-sm text-gray-600">Here's your reporting overview</p>
+                <h2 class="text-3xl font-bold text-gray-900">Selamat Datang, {{ auth()->user()->name }}!</h2>
+                <p class="mt-1 text-sm text-gray-600">Berikut adalah ringkasan laporan Anda</p>
             </div>
 
             <!-- Statistics Cards -->
@@ -26,7 +26,7 @@
                             </div>
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">My Reports</dt>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Laporan Semester</dt>
                                     <dd class="text-3xl font-bold text-gray-900">{{ number_format($totalReports) }}</dd>
                                 </dl>
                             </div>
@@ -45,7 +45,7 @@
                             </div>
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">Total Cost</dt>
+                                    <dt class="text-sm font-medium text-gray-500 truncate">Total Biaya</dt>
                                     <dd class="text-2xl font-bold text-gray-900">Rp {{ number_format($totalCost, 0, ',', '.') }}</dd>
                                 </dl>
                             </div>

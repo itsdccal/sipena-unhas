@@ -38,12 +38,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <h3 class="text-lg font-medium text-gray-900 mb-2">No Report Yet</h3>
-                    <p class="text-sm text-gray-500 mb-6">Create your first semester to get started</p>
-                    <button type="button" @click="$dispatch('open-modal', 'add-semester-modal')"
-                        class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700">
-                        + Add First Semester
-                    </button>
+                    <h3 class="text-lg font-medium text-gray-900 mb-2">Belum Ada Laporan</h3>
+                    <p class="text-sm text-gray-500 mb-6">Buat Laporan Terlebih Dahulu</p>
                 </div>
             @else
                 <!-- Report Header Info -->
@@ -261,13 +257,13 @@
                                     <tr class="bg-gray-50">
                                         <td colspan="10" class="px-4 py-4 text-center">
                                             <button type="button" @click="openAddActivityModal({{ $report->id }})"
-                                                class="inline-flex items-center px-4 py-2 bg-blue-100 text-white text-sm font-medium rounded hover:bg-blue-700">
+                                                class="inline-flex items-center px-4 py-2 bg-blue-700 text-white text-sm font-medium rounded">
                                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                         stroke-width="2" d="M12 4v16m8-8H4" />
                                                 </svg>
-                                                + Add Activity
+                                                Tambah Aktivitas
                                             </button>
                                         </td>
                                     </tr>
