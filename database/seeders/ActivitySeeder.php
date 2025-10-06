@@ -18,9 +18,9 @@ class ActivitySeeder extends Seeder
     public function run(): void
     {
         // Ambil data yang sudah ada
-        $studyProgram = StudyProgram::where('sp_code', 'KED-001')->first(); // Pendidikan Dokter
         $user = User::where('role', 'staff')->first(); // Ambil user staff pertama
 
+        $studyProgram = StudyProgram::find($user->study_program_id);
         // Ambil unit IDs
         $unitKEG = Unit::where('name', 'KEG')->first();
         $unitSKSTM = Unit::where('name', 'SKS TM')->first();
