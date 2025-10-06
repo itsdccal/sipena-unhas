@@ -10,13 +10,13 @@ class SemesterSeeder extends Seeder
     public function run(): void
     {
         $semesters = [
-            ['semester_code' => 'sem1', 'semester_name' => 'semester 1'],
-            ['semester_code' => 'sem2', 'semester_name' => 'semester 2'],
-            ['semester_code' => 'sem3', 'semester_name' => 'semester 3'],
-            ['semester_code' => 'sem4', 'semester_name' => 'semester 4'],
-            ['semester_code' => 'sem5', 'semester_name' => 'semester 5'],
-            ['semester_code' => 'sem6', 'semester_name' => 'semester 6'],
-            ['semester_code' => 'sem7', 'semester_name' => 'semester 7'],
+            ['semester_code' => 'SEM1', 'semester_name' => 'SEMESTER 1'],
+            ['semester_code' => 'SEM2', 'semester_name' => 'SEMESTER 2'],
+            ['semester_code' => 'SEM3', 'semester_name' => 'SEMESTER 3'],
+            ['semester_code' => 'SEM4', 'semester_name' => 'SEMESTER 4'],
+            ['semester_code' => 'SEM5', 'semester_name' => 'SEMESTER 5'],
+            ['semester_code' => 'SEM6', 'semester_name' => 'SEMESTER 6'],
+            ['semester_code' => 'SEM7', 'semester_name' => 'SEMESTER 7'],
         ];
 
         foreach ($semesters as $semester) {

@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             UsersSeeder::class,
             SemesterSeeder::class,
             UnitSeeder::class,
+            ActivitySeeder::class,
         ]);
     }
 }

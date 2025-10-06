@@ -13,6 +13,7 @@ class UnitSeeder extends Seeder
             ['name' => 'SKS TM'],
             ['name' => 'OK'],
             ['name' => 'KEG'],
+            ['name' => 'DU']
         ];
 
         foreach ($units as $unit) {
