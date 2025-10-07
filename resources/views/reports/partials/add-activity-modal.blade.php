@@ -67,7 +67,7 @@
 
                 <div class="md:col-span-2">
                     <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">
-                        Catatan
+                        Keterangan
                     </label>
                     <textarea id="notes" name="notes" rows="3" x-model="activity.notes"
                         class="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
