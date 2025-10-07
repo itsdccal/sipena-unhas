@@ -26,7 +26,12 @@ class AdminDegreeController extends Controller
 
         $degrees = $query->latest()->paginate(15);
 
-        return view('admin.degrees.index', compact('degrees'));
+        // Get all degrees for search suggestions
+        $allDegrees = Degree::select('id', 'degree_name', 'degree_code')
+            ->orderBy('degree_name')
+            ->get();
+
+        return view('admin.degrees.index', compact('degrees', 'allDegrees'));
     }
 
     /**

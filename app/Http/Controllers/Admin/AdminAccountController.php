@@ -23,7 +23,7 @@ class AdminAccountController extends Controller
             $search = $request->input('search');
             $query->where(function ($q) use ($search): void {
                 $q->where('name', 'like', '%' . $search . '%')
-                  ->orWhere('nip', 'like', '%' . $search . '%'); 
+                  ->orWhere('nip', 'like', '%' . $search . '%');
             });
         }
 
@@ -44,10 +44,15 @@ class AdminAccountController extends Controller
 
         $users = $query->latest()->paginate(15);
 
-        // PERBAIKAN: Hapus filter is_active karena kolom tidak ada
-        $studyPrograms = StudyProgram::all(); // atau ::orderBy('sp_name')->get()
+        // Get data for filters
+        $studyPrograms = StudyProgram::all();
 
-        return view('admin.accounts.index', compact('users', 'studyPrograms'));
+        // Get all users for search suggestions
+        $allUsers = User::select('id', 'name', 'nip', 'role')
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.accounts.index', compact('users', 'studyPrograms', 'allUsers'));
     }
 
     public function create(): View
@@ -103,7 +108,7 @@ class AdminAccountController extends Controller
 
         $data = [
             'name' => $validated['name'],
-            'nip' => $validated['nip'], 
+            'nip' => $validated['nip'],
             'role' => $validated['role'],
             'study_program_id' => $validated['study_program_id'] ?? null,
             'status' => $validated['status']

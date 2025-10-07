@@ -22,7 +22,13 @@ class AdminStudyProgramController extends Controller
             $search = $request->input('search');
             $query->where(function ($q) use ($search): void {
                 $q->where('sp_name', 'like', '%' . $search . '%')
-                  ->orWhere('sp_code', 'like', '%' . $search . '%');
+                  ->orWhere('sp_code', 'like', '%' . $search . '%')
+                  ->orWhereHas('faculty', function ($q) use ($search) {
+                      $q->where('faculty_name', 'LIKE', '%' . $search . '%');
+                  })
+                  ->orWhereHas('degree', function ($q) use ($search) {
+                      $q->where('degree_name', 'LIKE', '%' . $search . '%');
+                  });
             });
         }
 
@@ -40,7 +46,12 @@ class AdminStudyProgramController extends Controller
         $faculties = Faculty::orderBy('faculty_name')->get();
         $degrees = Degree::orderBy('degree_name')->get();
 
-        return view('admin.study-programs.index', compact('studyPrograms', 'faculties', 'degrees'));
+        // All study programs for search suggestions
+        $allStudyPrograms = StudyProgram::with(['degree', 'faculty'])
+            ->orderBy('sp_name')
+            ->get();
+
+        return view('admin.study-programs.index', compact('studyPrograms', 'faculties', 'degrees', 'allStudyPrograms'));
     }
 
     public function create(): View

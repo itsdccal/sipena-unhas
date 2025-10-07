@@ -29,7 +29,12 @@ class AdminFacultyController extends Controller
 
         $faculties = $query->latest()->paginate(15);
 
-        return view('admin.faculties.index', compact('faculties'));
+        // All faculties for search suggestions
+        $allFaculties = Faculty::with(['studyPrograms'])
+            ->orderBy('faculty_name')
+            ->get();
+
+        return view('admin.faculties.index', compact('faculties', 'allFaculties'));
     }
 
     /**
