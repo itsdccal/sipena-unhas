@@ -33,6 +33,9 @@
                             <x-nav-link :href="route('admin.study-programs.index')" :active="request()->routeIs('admin.study-programs.*')">
                                 {{ __('Data Akademik') }}
                             </x-nav-link>
+                            <x-nav-link :href="route('admin.units.index')" :active="request()->routeIs('admin.units.*')">
+                                {{ __('Kelola Satuan') }}
+                            </x-nav-link>
                         @endif
                     @endauth
                 </div>
@@ -130,6 +133,9 @@
                     </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('admin.study-programs.index')" :active="request()->routeIs('admin.study-programs.*')">
                         {{ __('Data Akademik') }}
+                    </x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('admin.units.index')" :active="request()->routeIs('admin.units.*')">
+                        {{ __('Kelola Satuan') }}
                     </x-responsive-nav-link>
                 @endif
             @endauth
