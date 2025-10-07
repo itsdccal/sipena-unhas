@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Report;
-use App\Models\Semester;
 use App\Models\StudyProgram;
+use App\Models\Faculty;
+use App\Models\Degree;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,45 +15,49 @@ class AdminReportController extends Controller
 {
     public function index(Request $request): View
     {
-        $query = Report::with(['studyProgram', 'semester', 'user']);
+        // Get study programs that have reports
+        $query = StudyProgram::with(['degree', 'faculty'])
+            ->whereHas('reports')
+            ->withCount('reports')
+            ->withSum('reports', 'grand_total');
 
-        // Search
+        // Apply search filter if provided
         if ($request->filled('search')) {
             $search = $request->input('search');
-            $query->where(function ($q) use ($search): void {
-                $q->where('program_type', 'like', '%' . $search . '%')
-                  ->orWhereHas('user', function ($q) use ($search): void {
-                      $q->where('name', 'like', '%' . $search . '%');
+            $query->where(function ($q) use ($search) {
+                $q->where('sp_name', 'LIKE', '%' . $search . '%')
+                  ->orWhere('sp_code', 'LIKE', '%' . $search . '%')
+                  ->orWhereHas('degree', function ($q) use ($search) {
+                      $q->where('degree_name', 'LIKE', '%' . $search . '%');
+                  })
+                  ->orWhereHas('faculty', function ($q) use ($search) {
+                      $q->where('faculty_name', 'LIKE', '%' . $search . '%');
                   });
             });
         }
 
-        // Filter by Study Program
-        if ($request->filled('study_program')) {
-            $query->where('study_program_id', $request->input('study_program'));
+        // Apply faculty filter if provided
+        if ($request->filled('faculty')) {
+            $query->where('faculty_id', $request->input('faculty'));
         }
 
-        // Filter by Semester
-        if ($request->filled('semester')) {
-            $query->where('semester_id', $request->input('semester'));
+        // Apply degree filter if provided
+        if ($request->filled('degree')) {
+            $query->where('degree_id', $request->input('degree'));
         }
 
-        // Filter by Date Range
-        if ($request->filled('date_from')) {
-            $query->whereDate('created_at', '>=', $request->input('date_from'));
-        }
+        $studyProgramsWithReports = $query->orderBy('sp_name')->get();
 
-        if ($request->filled('date_to')) {
-            $query->whereDate('created_at', '<=', $request->input('date_to'));
-        }
+        // Get all faculties and degrees for filter dropdowns
+        $faculties = Faculty::orderBy('faculty_name')->get();
+        $degrees = Degree::orderBy('degree_name')->get();
 
-        $reports = $query->latest()->paginate(15);
+        // All study programs for search suggestions (including those without reports)
+        $allStudyPrograms = StudyProgram::with(['degree', 'faculty'])
+            ->orderBy('sp_name')
+            ->get();
 
-        // PERBAIKAN: Hapus filter is_active
-        $studyPrograms = StudyProgram::orderBy('sp_name')->get();
-        $semesters = Semester::orderBy('semester_name')->get();
-
-        return view('admin.reports.index', compact('reports', 'studyPrograms', 'semesters'));
+        return view('admin.reports.index', compact('studyProgramsWithReports', 'faculties', 'degrees', 'allStudyPrograms'));
     }
 
     public function show(Report $report): View
@@ -60,6 +65,19 @@ class AdminReportController extends Controller
         $report->load(['studyProgram', 'semester', 'user', 'activityDetails']);
 
         return view('admin.reports.show', compact('report'));
+    }
+
+    public function showProgram(StudyProgram $studyProgram): View
+    {
+        // Get all reports for this study program with details
+        $reports = Report::with(['semester', 'user', 'activityDetails.unit'])
+            ->where('study_program_id', $studyProgram->id)
+            ->orderBy('semester_id', 'asc')
+            ->get();
+
+        $studyProgram->load(['degree', 'faculty']);
+
+        return view('admin.reports.show-program', compact('studyProgram', 'reports'));
     }
 
     public function destroy(Report $report): RedirectResponse

@@ -72,6 +72,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
 
     // Report Management
     Route::get('reports', [AdminReportController::class, 'index'])->name('reports.index');
+    Route::get('reports/program/{studyProgram}', [AdminReportController::class, 'showProgram'])->name('reports.show-program');
     Route::get('reports/{report}', [AdminReportController::class, 'show'])->name('reports.show');
     Route::delete('reports/{report}', [AdminReportController::class, 'destroy'])->name('reports.destroy');
     Route::get('reports/export/excel', [AdminReportController::class, 'exportExcel'])->name('reports.export.excel');
