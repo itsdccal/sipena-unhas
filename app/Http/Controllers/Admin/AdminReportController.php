@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\AdminReportExport;
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\Admin;
 use App\Models\Report;
 use App\Models\StudyProgram;
 use App\Models\Faculty;
@@ -10,6 +12,7 @@ use App\Models\Degree;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminReportController extends Controller
 {
@@ -88,9 +91,8 @@ class AdminReportController extends Controller
             ->with('success', 'Report deleted successfully!');
     }
 
-    public function exportExcel(Request $request): mixed
+    public function exportProgram(StudyProgram $studyProgram)
     {
-        // TODO: Implement Excel export
-        return redirect()->back()->with('info', 'Export feature coming soon!');
+        return Excel::download(new AdminReportExport($studyProgram), 'Laporan_Prodi_'.$studyProgram->sp_name.'.xlsx');
     }
 }

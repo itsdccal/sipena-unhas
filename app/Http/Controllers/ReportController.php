@@ -174,6 +174,7 @@ class ReportController extends Controller
 
     public function export()
     {
-        return Excel::download(new ReportExport, 'reports.xlsx');
+        $user = Auth::user();
+        return Excel::download(new ReportExport, 'Laporan_Prodi_'.$user->studyProgram->sp_name.'.xlsx');
     }
 }

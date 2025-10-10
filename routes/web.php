@@ -75,7 +75,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::get('reports/program/{studyProgram}', [AdminReportController::class, 'showProgram'])->name('reports.show-program');
     Route::get('reports/{report}', [AdminReportController::class, 'show'])->name('reports.show');
     Route::delete('reports/{report}', [AdminReportController::class, 'destroy'])->name('reports.destroy');
-    Route::get('reports/export/excel', [AdminReportController::class, 'exportExcel'])->name('reports.export.excel');
+    Route::get('reports/export/excel/{studyProgram}', [AdminReportController::class, 'exportProgram'])->name('reports.export');
 });
 
 require __DIR__.'/auth.php';
