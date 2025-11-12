@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminAccountController;
+use App\Http\Controllers\Admin\AdminActivityTemplateController;
 use App\Http\Controllers\Admin\AdminDegreeController;
 use App\Http\Controllers\Admin\AdminFacultyController;
 use App\Http\Controllers\Admin\AdminReportController;
@@ -53,7 +54,10 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::resource('accounts', AdminAccountController::class);
     Route::patch('accounts/{user}/toggle-status', [AdminAccountController::class, 'toggleStatus'])->name('accounts.toggle-status');
 
-     Route::resource('units', App\Http\Controllers\Admin\UnitController::class);
+    // Activity Template Management
+    Route::resource('activity-templates', AdminActivityTemplateController::class);
+
+    Route::resource('units', App\Http\Controllers\Admin\UnitController::class);
 
     // Study Program Management
     Route::resource('study-programs', AdminStudyProgramController::class);

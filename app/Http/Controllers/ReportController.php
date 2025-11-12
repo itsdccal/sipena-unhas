@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\ReportExport;
 use App\Models\ActivityDetail;
+use App\Models\ActivityTemplate;
 use App\Models\Report;
 use App\Models\StudyProgram;
 use App\Models\Semester;
@@ -31,8 +32,9 @@ class ReportController extends Controller
         $studyPrograms = StudyProgram::with('degree')->get();
         $semesters = Semester::orderBy('id', 'asc')->get();
         $units = Unit::all();
+        $activityTemplates = ActivityTemplate::active()->orderBy('activity_name')->get();
 
-        return view('reports.index', compact('reports', 'studyPrograms', 'semesters', 'units'));
+        return view('reports.index', compact('reports', 'studyPrograms', 'semesters', 'units', 'activityTemplates'));
     }
 
     public function store(Request $request)
